@@ -553,5 +553,13 @@ async def get_text_to_texture_task(task_id: str) -> Dict[str, Any]:
         return response.json()
 
 if __name__ == "__main__":
-    # Start the MCP server
-    mcp.run()
+    import os
+    port = int(os.getenv("PORT", "8000"))
+
+    # Lancement en HTTP pour Render (compatibilité nouvelles/anciennes versions)
+    try:
+        # mcp >= 1.20 environ
+        mcp.run_http(host="0.0.0.0", port=port)
+    except AttributeError:
+        # fallback pour versions plus anciennes
+        mcp.run(transport="http", host="0.0.0.0", port=port)
