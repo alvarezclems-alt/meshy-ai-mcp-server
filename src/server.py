@@ -9,6 +9,10 @@ from dotenv import load_dotenv
 from pydantic import BaseModel, Field
 from typing import List, Optional, Dict, Any, Union, Literal
 from mcp.server.fastmcp import FastMCP
+from fastmcp import FastMCP
+from starlette.responses import JSONResponse
+from starlette.requests import Request
+
 
 # Load environment variables from .env file
 load_dotenv()
@@ -552,14 +556,15 @@ async def get_text_to_texture_task(task_id: str) -> Dict[str, Any]:
         response.raise_for_status()
         return response.json()
 
-if __name__ == "__main__":
-    import os
-    port = int(os.getenv("PORT", "8000"))
+# Petites routes santé (facultatif mais utile sur Render)
+@mcp.custom_route("/healthz", methods=["GET"])
+async def healthz(_):
+    return JSONResponse({"ok": True})
 
-    # Lancement en HTTP pour Render (compatibilité nouvelles/anciennes versions)
-    try:
-        # mcp >= 1.20 environ
-        mcp.run_http(host="0.0.0.0", port=port)
-    except AttributeError:
-        # fallback pour versions plus anciennes
-        mcp.run(transport="http", host="0.0.0.0", port=port)
+@mcp.custom_route("/", methods=["GET"])
+async def root(_):
+    return JSONResponse({"service": "meshy-mcp-server", "status": "up"})
+
+# Expose l'app ASGI pour uvicorn
+app = mcp.http_app()
+
