@@ -12,6 +12,8 @@ from mcp.server.fastmcp import FastMCP
 from fastmcp import FastMCP
 from starlette.responses import JSONResponse
 from starlette.requests import Request
+from mcp.server.fastmcp import FastMCP   # ← à supprimer
+from fastmcp import FastMCP              # ← garder uniquement celui-ci
 
 
 # Load environment variables from .env file
